@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: expertbook
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: node server.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_URL
+        sync: false
