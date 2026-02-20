@@ -2,6 +2,8 @@
 
 A full-stack real-time session booking platform built with **React**, **Node.js**, **Express**, **MongoDB**, and **Socket.io**.
 
+🚀 **[View Live Site](https://session-booking-system.onrender.com)**
+
 ![Tech Stack](https://img.shields.io/badge/React-19-61DAFB?logo=react) ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js) ![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb) ![Socket.io](https://img.shields.io/badge/Socket.io-Realtime-010101?logo=socket.io)
 
 ---
