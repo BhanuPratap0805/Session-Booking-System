@@ -74,9 +74,56 @@ function ExpertDetail() {
         );
     }
 
-    // Group slots by date
+    // Filter and sort slots
+    const now = new Date();
+
+    // Sort slots chronologically and filter past slots
+    const processedSlots = (expert.availableSlots || [])
+        .filter((slot) => {
+            // Create a Date object for the slot
+            // slot.date is like '2026-02-21', slot.time is like '02:30 PM'
+
+            // Parse time (e.g., '02:30 PM' -> hours and minutes)
+            const timeMatch = slot.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+            if (!timeMatch) return true; // Keep if parsing fails
+
+            let hours = parseInt(timeMatch[1], 10);
+            const minutes = parseInt(timeMatch[2], 10);
+            const period = timeMatch[3].toUpperCase();
+
+            if (period === 'PM' && hours < 12) hours += 12;
+            if (period === 'AM' && hours === 12) hours = 0;
+
+            const slotDateTime = new Date(`${slot.date}T00:00:00`);
+            slotDateTime.setHours(hours, minutes, 0, 0);
+
+            // Keep slot if it's in the future
+            return slotDateTime > now;
+        })
+        .sort((a, b) => {
+            // Sort by date first
+            if (a.date !== b.date) {
+                return new Date(a.date) - new Date(b.date);
+            }
+
+            // If same date, sort by time
+            const parseTime = (timeStr) => {
+                const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+                if (!match) return 0;
+                let h = parseInt(match[1], 10);
+                const m = parseInt(match[2], 10);
+                const p = match[3].toUpperCase();
+                if (p === 'PM' && h < 12) h += 12;
+                if (p === 'AM' && h === 12) h = 0;
+                return h * 60 + m; // Convert to minutes for easy comparison
+            };
+
+            return parseTime(a.time) - parseTime(b.time);
+        });
+
+    // Group sorted & filtered slots by date
     const slotsByDate = {};
-    (expert.availableSlots || []).forEach((slot) => {
+    processedSlots.forEach((slot) => {
         const dateKey = new Date(slot.date + 'T00:00:00').toLocaleDateString('en-US', {
             weekday: 'long', month: 'long', day: 'numeric',
         });
@@ -84,7 +131,7 @@ function ExpertDetail() {
         slotsByDate[dateKey].slots.push(slot);
     });
 
-    const available = (expert.availableSlots || []).filter((s) => !s.isBooked).length;
+    const available = processedSlots.filter((s) => !s.isBooked).length;
 
     const EMOJI_MAP = { Technology: '💻', Business: '📊', Health: '🧬', Design: '🎨', Education: '📚' };
 
